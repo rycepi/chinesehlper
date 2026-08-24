@@ -1,0 +1,112 @@
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 16px;
+  color: #e2e8f0;
+  background: #0f172a;
+}
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+}
+h1 { margin-top: 0; }
+section {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+input[type="text"] {
+  padding: 8px;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 6px;
+}
+select {
+  padding: 8px;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 6px;
+}
+button {
+  padding: 8px 12px;
+  margin-right: 6px;
+  border: none;
+  border-radius: 6px;
+  background: #22d3ee;
+  font-weight: 700;
+  cursor: pointer;
+  color: #0f172a;
+}
+button.secondary {
+  background: #334155;
+  color: #e2e8f0;
+}
+.dict-actions { margin-top: 6px; }
+.status {
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.flashcard-actions {
+  margin-top: 8px;
+}
+.flashcard-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+.flashcard-item {
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #0b1220;
+}
+.flashcard-view .term {
+  font-weight: 700;
+  font-size: 18px;
+}
+.flashcard-view .pinyin {
+  color: #fbbf24;
+  margin-bottom: 4px;
+}
+.flashcard-view .defs {
+  margin-bottom: 6px;
+}
+.practice {
+  border: 1px dashed #475569;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  background: #0f172a;
+}
+.practice-term {
+  font-size: 22px;
+  font-weight: 700;
+}
+.practice-pinyin {
+  color: #fbbf24;
+}
+.practice-defs {
+  margin-top: 6px;
+  font-weight: 600;
+}
+.practice-actions {
+  margin-top: 8px;
+}

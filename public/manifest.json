@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Chinese Helper",
+  "version": "0.2.0",
+  "description": "Hover-to-lookup Chinese dictionary with translation and flashcards.",
+  "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Chinese Helper",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["chunks/*", "assets/*", "data/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

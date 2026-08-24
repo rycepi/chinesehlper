@@ -1,0 +1,9 @@
+[
+  {"traditional": "你好", "simplified": "你好", "pinyin": "ni3 hao3", "definitions": ["hello", "hi"]},
+  {"traditional": "中国", "simplified": "中国", "pinyin": "Zhong1 guo2", "definitions": ["China"]},
+  {"traditional": "学习", "simplified": "学习", "pinyin": "xue2 xi2", "definitions": ["to study", "to learn"]},
+  {"traditional": "谢谢", "simplified": "谢谢", "pinyin": "xie4 xie", "definitions": ["thank you"]},
+  {"traditional": "再见", "simplified": "再见", "pinyin": "zai4 jian4", "definitions": ["goodbye"]},
+  {"traditional": "中文", "simplified": "中文", "pinyin": "Zhong1 wen2", "definitions": ["Chinese language"]},
+  {"traditional": "学生", "simplified": "学生", "pinyin": "xue2 sheng", "definitions": ["student"]}
+]
