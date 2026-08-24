@@ -27,6 +27,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [cards, setCards] = useState([]);
   const [enabled, setEnabled] = useState(true);
+  const [spotifySimplifyEnabled, setSpotifySimplifyEnabled] = useState(true);
+  const [spotifyPinyinEnabled, setSpotifyPinyinEnabled] = useState(true);
   const cardCount = useMemo(() => cards.length, [cards]);
 
   useEffect(() => {
@@ -57,6 +59,33 @@ export default function App() {
     const res = await api.runtime.sendMessage({ type: "getSettings" });
     if (res?.settings && typeof res.settings.enabled === "boolean") {
       setEnabled(res.settings.enabled);
+    }
+    const settings = res?.settings || {};
+    setSpotifySimplifyEnabled(settings.spotifySimplifyEnabled !== false && settings.spotifyLyricsEnabled !== false);
+    setSpotifyPinyinEnabled(settings.spotifyPinyinEnabled !== false && settings.spotifyLyricsEnabled !== false);
+  }
+
+  async function toggleSpotifySetting(name) {
+    // Each button changes only its own preference. The content script receives
+    // both values so it can rebuild the current lyric lines immediately.
+    const nextSimplify = name === "simplify" ? !spotifySimplifyEnabled : spotifySimplifyEnabled;
+    const nextPinyin = name === "pinyin" ? !spotifyPinyinEnabled : spotifyPinyinEnabled;
+    setSpotifySimplifyEnabled(nextSimplify);
+    setSpotifyPinyinEnabled(nextPinyin);
+    await api.runtime.sendMessage({ type: "saveSettings", settings: {
+      spotifySimplifyEnabled: nextSimplify,
+      spotifyPinyinEnabled: nextPinyin,
+      spotifyLyricsEnabled: nextSimplify || nextPinyin
+    } });
+    try {
+      const [tab] = await api.tabs.query({ active: true, currentWindow: true });
+      if (tab?.id) api.tabs.sendMessage(tab.id, {
+        type: "setSpotifyLyricsSettings",
+        simplify: nextSimplify,
+        pinyin: nextPinyin
+      }).catch(() => {});
+    } catch (e) {
+      // ignore pages where content scripts cannot run
     }
   }
 
@@ -104,6 +133,17 @@ export default function App() {
         <h2>Scanning</h2>
         <button onClick={toggleEnabled}>Scanning: {enabled ? "On" : "Off"}</button>
         <div className="status">Controls hover lookups on pages.</div>
+      </div>
+
+      <div className="section">
+        <h2>Spotify lyrics</h2>
+        <button onClick={() => toggleSpotifySetting("simplify")}>
+          Simplified: {spotifySimplifyEnabled ? "On" : "Off"}
+        </button>
+        <button onClick={() => toggleSpotifySetting("pinyin")}>
+          Pinyin: {spotifyPinyinEnabled ? "On" : "Off"}
+        </button>
+        <div className="status">Applies to lyrics shown on open.spotify.com.</div>
       </div>
 
       <div className="section cards">

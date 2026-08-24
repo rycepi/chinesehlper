@@ -7,6 +7,9 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    // Browser extension pages can reject Vite's modulepreload links as
+    // cross-world extension resources. Chunks still load normally on demand.
+    modulePreload: false,
     rollupOptions: {
       input: {
         popup: resolve(__dirname, "popup.html"),

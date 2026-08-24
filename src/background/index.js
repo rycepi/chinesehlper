@@ -8,6 +8,9 @@ const defaultSettings = {
   translationBase: "",
   apiKey: "",
   enabled: true,
+  spotifyLyricsEnabled: true,
+  spotifySimplifyEnabled: true,
+  spotifyPinyinEnabled: true,
   displayScript: "simplified"
 };
 
@@ -35,6 +38,11 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 });
 
 const messageHandlers = {
+  async getBundledDictionary() {
+    const response = await fetch(api.runtime.getURL("data/cedict_ts.u8"));
+    if (!response.ok) throw new Error(`CEDICT request failed: ${response.status}`);
+    return { text: await response.text() };
+  },
   async translateParagraph(msg) {
     const translation = await translateText(msg.text || "");
     return { translation };

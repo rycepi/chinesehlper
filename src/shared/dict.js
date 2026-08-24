@@ -46,8 +46,19 @@ async function persistMeta() {
 }
 
 async function loadBundledCedictEntries() {
-  const res = await fetch(CEDICT_URL);
-  const text = await res.text();
+  let text;
+  try {
+    const res = await fetch(CEDICT_URL);
+    if (!res.ok) throw new Error(`CEDICT request failed: ${res.status}`);
+    text = await res.text();
+  } catch (err) {
+    // Some browsers block content-script fetches to extension URLs on
+    // restricted or embedded pages. Ask the service worker to fetch it from
+    // the extension context instead.
+    const response = await api.runtime.sendMessage({ type: "getBundledDictionary" });
+    if (!response?.text) throw err;
+    text = response.text;
+  }
   const entries = parseCedictText(text);
   if (entries.length < 10000) {
     throw new Error(`CEDICT parse too small: ${entries.length}`);
