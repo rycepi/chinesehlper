@@ -1,13 +1,14 @@
 {
   "name": "zhpopup-extension",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --config vite.content.config.js",
+    "build": "vite build && vite build --config vite.content.config.js && vite build --config vite.spotify.config.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "pinyin-pro": "^3.29.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

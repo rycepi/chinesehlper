@@ -1,7 +1,30 @@
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
+import { placePopup } from "./popupPosition.mjs";
 import { formatPinyin, formatPinyinLower } from "../shared/pinyin";
 
 export function Popup({ match, displayScript, position, selectionText, addStatus, onAddCard, onAddAll, onJump, onClose }) {
+  const popupRef = useRef(null);
+  useLayoutEffect(() => {
+    const node = popupRef.current;
+    if (!node || !match) return;
+    const update = () => {
+      const rect = node.getBoundingClientRect();
+      const { x, y } = placePopup(position, rect, {
+        width: document.documentElement.clientWidth,
+        height: window.innerHeight
+      });
+      node.style.left = `${x}px`;
+      node.style.top = `${y}px`;
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [match, position]);
   if (!match) return null;
   const entries = match.entries || [];
   const primary = entries[0] || {};
@@ -66,11 +89,13 @@ export function Popup({ match, displayScript, position, selectionText, addStatus
   };
   return (
     <div
+      ref={popupRef}
       className="zh-popup"
       style={{ left: `${position.x}px`, top: `${position.y}px` }}
       onMouseDown={e => e.stopPropagation()}
     >
       <h3>{displayText}</h3>
+      <div className="zh-popup-definitions" tabIndex={0} role="region" aria-label="Dictionary definitions">
       {entries.map((entry, idx) => (
         <div key={idx} className="entry-block">
           <div className="pinyin">{formatPinyin(entry.pinyin || "")}</div>
@@ -99,6 +124,7 @@ export function Popup({ match, displayScript, position, selectionText, addStatus
           </button>
         </div>
       )}
+      </div>
       <div className="actions">
         <button className="secondary" onClick={onClose}>
           Close

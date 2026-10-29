@@ -1,55 +1,41 @@
-# Chinese Helper
+# Chinese Helper (Chrome/Edge extension)
 
-Chinese Helper is a Chrome/Chromium Manifest V3 extension for looking up Chinese text while browsing and building a personal flashcard deck. Hold `Shift` and hover over Chinese text to open a dictionary popup with matching characters, pinyin, and definitions.
+A Yomitan-style hover dictionary for Chinese built with React + Vite. Hover to get pinyin/definitions, translate passages, and save words to flashcards.
 
 ## Features
+- Hover lookup: find the word under your cursor and show pinyin + definitions.
+- Paragraph translation: paste text in the popup or click translate in the hover card (LibreTranslate-compatible API by default).
+- Flashcards: save terms with one click; manage them from the action popup.
+- Dictionary import: load full CEDICT text files from the Options page; ships with a small sample.
 
-- Shift + hover lookup using the bundled CEDICT dictionary.
-- Simplified and traditional character display.
-- Save lookups to flashcards from the popup or page context menu.
-- Review, edit, delete, and score flashcards from Options.
-- Translate pasted Chinese paragraphs through a configurable endpoint.
-- Enable or disable page scanning from the extension popup.
+## Quick start (Chrome/Edge)
+1. Install deps: `npm install`
+2. Build: `npm run build` (outputs to `dist/`).
+3. Open `chrome://extensions` (or Edge extensions), enable Developer Mode.
+4. Click **Load unpacked** and select the `dist/` folder.
+5. Visit any page with Chinese text, hover to see the popup. Toggle on/off with `Alt+Z`.
 
-## Requirements
 
-- Node.js 18 or newer
-- Google Chrome, Chromium, or another Chromium-based browser
+## Translation API
+- API key, if set, is passed as `api_key` in the POST body.
 
-## Development
+## Files of interest
+- Manifest: [public/manifest.json](public/manifest.json)
+- Content script: [src/content/main.jsx](src/content/main.jsx)
+- Popup UI: [src/popup/App.jsx](src/popup/App.jsx)
+- Options UI: [src/options/App.jsx](src/options/App.jsx)
+- Dictionary utilities: [src/shared/dict.js](src/shared/dict.js)
+- Background worker: [src/background/index.js](src/background/index.js)
 
-```sh
-npm install
-npm run build
-```
+## Controls
+- `Shift+Z`: toggle hover lookup on/off.
+- Hover over Chinese text: popup appears with definitions, translate + add-card buttons.
+- Context menu on selected text: "Add to flashcards".
 
-The compiled extension is written to `dist/`. Use `npm run dev` for the Vite development server.
+## Caveats
+- Chrome storage quotas limit how much of CEDICT can be stored; a self-hosted dictionary API is recommended for very large datasets.
+- Translation depends on external services; failures fall back to a stub message.
 
-## Load the extension
-
-1. Open `chrome://extensions` (or the equivalent extensions page).
-2. Enable **Developer mode**.
-3. Select **Load unpacked**.
-4. Choose this project’s `dist` directory.
-5. Reload the extension after each `npm run build`.
-
-## Configuration
-
-Open the extension popup and choose **Options** to configure translation. Requests are sent as `POST <Base URL>/translate` with `q`, `source`, `target`, `format`, and an optional `api_key`. The response should provide `translatedText` or `translation`.
-
-The bundled dictionary loads automatically. Options also shows dictionary statistics and can import a CEDICT-formatted file or clear the local dictionary.
-
-## Project structure
-
-```text
-src/background/  Service worker, settings, flashcards, translation
-src/content/     In-page Shift + hover lookup UI
-src/options/     Dictionary, translation, and flashcard management
-src/popup/       Extension popup
-src/shared/      Dictionary and pinyin helpers
-public/data/     Bundled dictionary data
-```
-
-## License
-
-No license has been specified yet.
+## Development notes
+- Build with Vite (`npm run build`); outputs stable filenames for MV3.
+- Background runs as an ES module service worker (`background.js`).

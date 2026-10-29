@@ -1,8 +1,15 @@
 export const popupStyles = `
 .zh-popup {
-  position: absolute;
+  position: fixed;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  max-height: min(420px, calc(100dvh - 16px));
+  overflow: hidden;
+  overflow-wrap: anywhere;
   z-index: 2147483647;
-  max-width: 320px;
+  max-width: calc(100vw - 16px);
   background: #0f172a;
   color: #e2e8f0;
   border: 1px solid #1e293b;
@@ -12,6 +19,17 @@ export const popupStyles = `
   font-family: "Segoe UI", sans-serif;
   font-size: 13px;
   line-height: 1.4;
+}
+
+.zh-popup-definitions {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.zh-popup > :not(.zh-popup-definitions) {
+  flex-shrink: 0;
 }
 
 .zh-popup h3 {

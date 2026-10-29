@@ -1,5 +1,5 @@
 import { loadDictionary } from "../shared/dict";
-import { formatPinyinLower } from "../shared/pinyin";
+import { lyricPinyin } from "./lyricPinyin.mjs";
 
 const PROCESSED = "zhSpotifyProcessed";
 const ORIGINAL = "zhSpotifyOriginal";
@@ -20,17 +20,16 @@ function lyricNodes() {
   return chineseNodes;
 }
 
-async function convertLine(text, index) {
+async function convertLine(text) {
   // The shared dictionary contains Traditional, Simplified, and pinyin data.
   // We use the longest matching dictionary entry so phrases are converted
   // before falling back to individual characters.
   const dictionary = await loadDictionary();
   if (!dictionary) {
-    return { simplified: text, pinyin: "" };
+    return { simplified: text, pinyin: lyricPinyin(text) };
   }
   const { words, maxLen } = dictionary;
   let simplified = "";
-  const pinyin = [];
   let cursor = 0;
   while (cursor < text.length) {
     let found = null;
@@ -46,25 +45,25 @@ async function convertLine(text, index) {
     if (!found) {
       // Preserve punctuation, spaces, and characters that are not in CEDICT.
       simplified += text[cursor];
-      pinyin.push("");
       cursor += 1;
       continue;
     }
     simplified += found.entry.simplified || found.piece;
-    pinyin.push(formatPinyinLower(found.entry.pinyin || ""));
     cursor += found.piece.length;
   }
-  const result = { simplified, pinyin: pinyin.filter(Boolean).join(" ") };
+  // Normalize traditional phrases before pronunciation; display remains controlled by the toggle.
+  const result = { simplified, pinyin: lyricPinyin(simplified) };
   return result;
 }
 
-async function processNode(node, settings) {
+async function processNode(node, settings, isActive) {
   // A line is processed only once per settings pass. When settings change,
   // restore() removes this marker and the line can be processed again.
   if (node.dataset[PROCESSED] === "true") return;
   const original = node.textContent || "";
   node.dataset[ORIGINAL] = original;
   const result = await convertLine(original);
+  if (!isActive() || !node.isConnected || node.textContent !== original) return;
   // Simplification and pinyin are independent, so either can be disabled.
   const simplifiedText = settings.simplify ? result.simplified : original;
   const pinyinText = settings.pinyin ? result.pinyin : "";
@@ -100,6 +99,8 @@ export function startSpotifyLyrics(settings = {}) {
     simplify: settings.simplify !== false,
     pinyin: settings.pinyin !== false
   };
+  if (!options.simplify && !options.pinyin) return () => {};
+  let active = true;
   // Keep the stylesheet local to this feature. It controls the smaller pinyin
   // line inserted below each Spotify lyric.
   const style = document.createElement("style");
@@ -111,7 +112,7 @@ export function startSpotifyLyrics(settings = {}) {
     running = true;
     try {
       const nodes = lyricNodes();
-      await Promise.all(nodes.map(node => processNode(node, options)));
+      await Promise.all(nodes.map(node => processNode(node, options, () => active)));
     } catch (err) {
       console.warn("Spotify lyric processing failed", err);
     } finally {
@@ -125,6 +126,7 @@ export function startSpotifyLyrics(settings = {}) {
   process();
   return () => {
     // The cleanup function is called whenever the user changes either toggle.
+    active = false;
     observer.disconnect();
     restore();
     style.remove();
